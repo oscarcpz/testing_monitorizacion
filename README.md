@@ -2,6 +2,8 @@
 
 Una aplicación de ejemplo que demuestra la integración de **Log4j2**, **Prometheus**, **Tests Unitarios** y **Selenium** en un proyecto Spring Boot.
 
+> 📚 **Documentación Completa:** Ver [DOCUMENTATION_INDEX.md](./DOCUMENTATION_INDEX.md) para acceso a todas las guías.
+
 ## 🎯 Características
 
 - ✅ **Spring Boot 3.2** - Framework web moderno
@@ -317,26 +319,36 @@ management:
 
 ## 🐛 Troubleshooting
 
-### Error: "ChromeDriver not found"
+Para ver los errores más comunes y sus soluciones, consulta: [**TROUBLESHOOTING.md**](./TROUBLESHOOTING.md)
+
+Este documento incluye:
+- ✅ Error de conflicto Log4j2
+- ✅ Error de inicialización de UserService
+- ✅ Problemas con tests de Selenium
+- ✅ Problemas de endpoints Prometheus
+- ✅ Cómo ejecutar tests de forma manual
+
+### Error rápido: "ChromeDriver not found"
 
 ```bash
 # WebDriverManager descargará automáticamente el driver
 # Si falla, instala Chrome/Chromium manualmente
 ```
 
-### Error: "Address already in use"
+### Error rápido: "Address already in use"
 
 ```bash
 # Cambiar puerto en application.yml o ejecutar en otro puerto
 mvn spring-boot:run -Dspring-boot.run.arguments="--server.port=8081"
 ```
 
-### Tests Selenium no funcionan
+### Error rápido: "Tests Selenium no funcionan"
 
 Asegúrate de:
 1. Ejecutar la aplicación: `mvn spring-boot:run`
 2. Chrome/Chromium está instalado
 3. Puerto 8080 está accesible
+4. Leer: [TROUBLESHOOTING.md](./TROUBLESHOOTING.md#tests-de-selenium-manual)
 
 ## 📝 Licencia
 
