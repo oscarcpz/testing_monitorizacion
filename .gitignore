@@ -1,0 +1,51 @@
+# Maven
+target/
+pom.xml.tag
+pom.xml.releaseBackup
+pom.xml.versionsBackup
+pom.xml.next
+release.properties
+dependency-reduced-pom.xml
+.flattened-pom.xml
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+.DS_Store
+.project
+.classpath
+.c9/
+*.launch
+.settings/
+*.sublime-workspace
+
+# Logs
+logs/
+*.log
+*.log.*
+
+# Spring Boot
+.mvn/
+mvnw
+mvnw.cmd
+application-local.properties
+
+# Build
+build/
+dist/
+*.jar
+*.war
+*.ear
+
+# Testing
+.coverage
+htmlcov/
+.pytest_cache/
+__pycache__/
+
+# OS
+.DS_Store
+Thumbs.db

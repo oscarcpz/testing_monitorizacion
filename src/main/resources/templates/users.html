@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestión de Usuarios</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        
+        header {
+            background-color: rgba(0, 0, 0, 0.3);
+            color: white;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+        }
+        
+        nav {
+            display: flex;
+            gap: 20px;
+            margin-top: 15px;
+        }
+        
+        nav a {
+            color: white;
+            text-decoration: none;
+            padding: 10px 20px;
+            background-color: rgba(255, 255, 255, 0.2);
+            border-radius: 5px;
+        }
+        
+        .container {
+            padding: 40px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .content {
+            background-color: white;
+            border-radius: 10px;
+            padding: 30px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+        }
+        
+        h1 {
+            color: #333;
+            margin-bottom: 30px;
+        }
+        
+        .form-section {
+            background-color: #f9f9f9;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+            border-left: 4px solid #667eea;
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #333;
+        }
+        
+        input, button {
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+        
+        input {
+            width: 100%;
+        }
+        
+        button {
+            background-color: #667eea;
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background-color 0.3s;
+        }
+        
+        button:hover {
+            background-color: #764ba2;
+        }
+        
+        .users-list {
+            margin-top: 30px;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        th {
+            background-color: #667eea;
+            color: white;
+            font-weight: bold;
+        }
+        
+        tr:hover {
+            background-color: #f5f5f5;
+        }
+        
+        .btn-group {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .btn-delete {
+            background-color: #e74c3c;
+            padding: 5px 15px;
+            font-size: 12px;
+        }
+        
+        .btn-delete:hover {
+            background-color: #c0392b;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: #999;
+        }
+        
+        .user-count {
+            background-color: #667eea;
+            color: white;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-size: 18px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>👥 Gestión de Usuarios</h1>
+        <nav>
+            <a href="/">Inicio</a>
+            <a href="/users">Usuarios</a>
+            <a href="/monitoring">Monitoreo</a>
+        </nav>
+    </header>
+    
+    <div class="container">
+        <div class="content">
+            <div class="user-count">
+                Total de usuarios: <span id="userCount" th:text="${userCount}">0</span>
+            </div>
+            
+            <div class="form-section">
+                <h2>Crear Nuevo Usuario</h2>
+                <form id="userForm" onsubmit="createUser(event)">
+                    <div class="form-group">
+                        <label for="name">Nombre:</label>
+                        <input type="text" id="name" name="name" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="email">Email:</label>
+                        <input type="email" id="email" name="email" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="age">Edad:</label>
+                        <input type="number" id="age" name="age" min="1" max="150" required>
+                    </div>
+                    
+                    <button type="submit">Crear Usuario</button>
+                </form>
+            </div>
+            
+            <div class="users-list">
+                <h2>Lista de Usuarios</h2>
+                <table id="usersTable">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Nombre</th>
+                            <th>Email</th>
+                            <th>Edad</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="usersList">
+                        <tr th:each="user : ${users}" th:id="'user-' + ${user.id}">
+                            <td th:text="${user.id}">ID</td>
+                            <td th:text="${user.name}">Nombre</td>
+                            <td th:text="${user.email}">Email</td>
+                            <td th:text="${user.age}">Edad</td>
+                            <td>
+                                <button class="btn-delete" th:onclick="'deleteUser(' + ${user.id} + ')'">Eliminar</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                <div id="emptyState" class="empty-state" th:if="${userCount == 0}">
+                    No hay usuarios registrados
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        function createUser(event) {
+            event.preventDefault();
+            
+            const user = {
+                name: document.getElementById('name').value,
+                email: document.getElementById('email').value,
+                age: parseInt(document.getElementById('age').value)
+            };
+            
+            fetch('/api/users', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(user)
+            })
+            .then(response => {
+                if (response.ok) {
+                    alert('Usuario creado exitosamente');
+                    document.getElementById('userForm').reset();
+                    location.reload();
+                } else {
+                    alert('Error al crear usuario');
+                }
+            })
+            .catch(error => console.error('Error:', error));
+        }
+        
+        function deleteUser(id) {
+            if (confirm('¿Estás seguro de que deseas eliminar este usuario?')) {
+                fetch('/api/users/' + id, {
+                    method: 'DELETE'
+                })
+                .then(response => {
+                    if (response.ok) {
+                        alert('Usuario eliminado');
+                        location.reload();
+                    } else {
+                        alert('Error al eliminar usuario');
+                    }
+                })
+                .catch(error => console.error('Error:', error));
+            }
+        }
+    </script>
+</body>
+</html>
