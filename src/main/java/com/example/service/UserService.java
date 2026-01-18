@@ -23,7 +23,7 @@ public class UserService {
 
     private void initializeMetrics() {
         // Métrica personalizada para contar usuarios
-        meterRegistry.gaugeMapSize("users.count", Collections.emptyList(), users);
+        meterRegistry.gauge("users.count", users, Map::size);
     }
 
     public User createUser(User user) {

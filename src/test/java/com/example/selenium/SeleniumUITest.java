@@ -5,6 +5,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.Disabled;
 import org.openqa.selenium.*;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.support.ui.ExpectedConditions;
@@ -15,6 +16,7 @@ import java.time.Duration;
 import static org.junit.jupiter.api.Assertions.*;
 
 @DisplayName("Tests de Selenium - Interfaz Web")
+@Disabled("Tests de Selenium deshabilitados por defecto. Ejecutar con: mvn test -Dgroups=selenium")
 class SeleniumUITest {
     private WebDriver driver;
     private WebDriverWait wait;

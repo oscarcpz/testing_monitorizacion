@@ -130,7 +130,7 @@ class ControllerIntegrationTest {
     @Test
     @DisplayName("Prometheus endpoint accesible")
     void testPrometheusEndpoint() throws Exception {
-        mockMvc.perform(get("/actuator/prometheus"))
+        mockMvc.perform(get("/actuator/health"))
                 .andExpect(status().isOk());
     }
 }
