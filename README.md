@@ -1,6 +1,6 @@
 # Aplicación Spring Boot - Monitoreo con Log4j2 y Prometheus
 
-Una aplicación de ejemplo que demuestra la integración de **Log4j2**, **Prometheus**, **Tests Unitarios** y **Selenium** en un proyecto Spring Boot.
+Una aplicación de ejemplo que demuestra la integración de **Log4j2**, **Prometheus**, **Tests Unitarios**, **Selenium** y **SonarQube** en un proyecto Spring Boot.
 
 > 📚 **Documentación Completa:** Ver [DOCUMENTATION_INDEX.md](./DOCUMENTATION_INDEX.md) para acceso a todas las guías.
 
@@ -10,15 +10,18 @@ Una aplicación de ejemplo que demuestra la integración de **Log4j2**, **Promet
 - ✅ **Log4j2** - Sistema de logging avanzado con configuración XML
 - ✅ **Prometheus** - Métricas de aplicación en tiempo real
 - ✅ **Spring Actuator** - Endpoints de monitoreo y salud
+- ✅ **SonarQube** - Análisis de calidad de código en contenedor
 - ✅ **Thymeleaf** - Motor de plantillas HTML
-- ✅ **Tests Unitarios** - JUnit 5 con MockMvc
+- ✅ **Tests Unitarios** - JUnit 5 con MockMvc y cobertura JaCoCo
 - ✅ **Selenium** - Pruebas automatizadas de interfaz web
 - ✅ **WebDriverManager** - Gestión automática de drivers
+- ✅ **Docker Compose** - Orquestación de servicios
 
 ## 🚀 Requisitos
 
 - **Java 17+**
 - **Maven 3.8+**
+- **Docker & Docker Compose**
 - **Chrome/Chromium** (para Selenium)
 
 ## 📦 Instalación
