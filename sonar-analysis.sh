@@ -15,7 +15,7 @@ NC='\033[0m' # No Color
 
 # Configuración
 SONARQUBE_URL="${SONARQUBE_URL:-http://localhost:9000}"
-SONARQUBE_TOKEN="${SONARQUBE_TOKEN:-squ_replacethiswithrealtoken}"
+SONARQUBE_TOKEN=""
 JAVA_HOME=$(/usr/libexec/java_home -v 17)
 
 echo -e "${BLUE}================================${NC}"
@@ -23,15 +23,30 @@ echo -e "${BLUE}  SonarQube Analysis Script${NC}"
 echo -e "${BLUE}================================${NC}"
 echo ""
 
+# Función para solicitar token de SonarQube
+request_sonarqube_token() {
+    if [ -z "$SONARQUBE_TOKEN" ]; then
+        echo -e "${YELLOW}Se requiere un token de SonarQube para ejecutar el análisis${NC}"
+        echo -e "${YELLOW}Puedes generarlo en: ${SONARQUBE_URL}/account/security${NC}"
+        echo ""
+        read -sp "Introduce tu token de SonarQube: " SONARQUBE_TOKEN
+        echo ""
+        if [ -z "$SONARQUBE_TOKEN" ]; then
+            echo -e "${RED}✗ Token requerido${NC}"
+            exit 1
+        fi
+    fi
+}
+
 # Función para verificar SonarQube
 check_sonarqube() {
     echo -e "${YELLOW}Verificando conexión a SonarQube...${NC}"
     
-    if curl -s -f "${SONARQUBE_URL}/api/system/health" > /dev/null; then
+    if curl -s -f "${SONARQUBE_URL}/" 2>/dev/null | grep -q "SonarQube"; then
         echo -e "${GREEN}✓ SonarQube está disponible en ${SONARQUBE_URL}${NC}"
     else
         echo -e "${RED}✗ Error: No se puede conectar a SonarQube en ${SONARQUBE_URL}${NC}"
-        echo -e "${YELLOW}Inicia SonarQube con: docker-compose up -d sonarqube${NC}"
+        echo -e "${YELLOW}Inicia SonarQube con: docker compose up -d sonarqube${NC}"
         exit 1
     fi
 }
@@ -54,6 +69,8 @@ run_tests() {
 # Función para ejecutar análisis de SonarQube
 run_sonarqube_analysis() {
     echo -e "${YELLOW}Ejecutando análisis de SonarQube...${NC}"
+    
+    request_sonarqube_token
     
     export JAVA_HOME=$(/usr/libexec/java_home -v 17)
     

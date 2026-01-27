@@ -22,6 +22,9 @@ DOCKER_COMPOSE_FILE="${PROJECT_DIR}/docker-compose.yml"
 # Funciones
 # ============================================================================
 
+# Variables globales
+SONARQUBE_PASSWORD=""
+
 print_header() {
     echo -e "\n${BLUE}========================================${NC}"
     echo -e "${BLUE}  $1${NC}"
@@ -42,6 +45,18 @@ print_info() {
 
 print_section() {
     echo -e "\n${MAGENTA}▶ $1${NC}\n"
+}
+
+# Solicitar contraseña de SonarQube
+request_sonarqube_password() {
+    if [ -z "$SONARQUBE_PASSWORD" ]; then
+        echo ""
+        read -sp "Introduce la contraseña de SonarQube (admin): " SONARQUBE_PASSWORD
+        echo ""
+        if [ -z "$SONARQUBE_PASSWORD" ]; then
+            SONARQUBE_PASSWORD="admin"
+        fi
+    fi
 }
 
 # Función para mostrar el menú
@@ -68,8 +83,10 @@ show_menu() {
 start_all() {
     print_header "Iniciando Infraestructura Completa"
     
+    request_sonarqube_password
+    
     print_section "Iniciando Docker Compose"
-    docker-compose up -d
+    docker compose up -d
     
     print_success "Docker Compose iniciado"
     
@@ -85,7 +102,7 @@ start_app_prometheus() {
     print_header "Iniciando App + Prometheus"
     
     print_section "Iniciando Docker Compose (sin SonarQube)"
-    docker-compose up -d app prometheus
+    docker compose up -d app prometheus
     
     print_success "App y Prometheus iniciados"
     sleep 3
@@ -96,8 +113,10 @@ start_app_prometheus() {
 start_sonarqube() {
     print_header "Iniciando SonarQube"
     
+    request_sonarqube_password
+    
     print_section "Iniciando SonarQube y PostgreSQL"
-    docker-compose up -d sonarqube db
+    docker compose up -d sonarqube db
     
     print_success "SonarQube iniciado"
     print_info "Esperando a que SonarQube esté listo (esto puede tomar 1-2 minutos)..."
@@ -107,7 +126,7 @@ start_sonarqube() {
     local attempt=0
     
     while [ $attempt -lt $max_attempts ]; do
-        if curl -s -f http://localhost:9000/api/system/health > /dev/null 2>&1; then
+        if curl -s -f http://localhost:9000/ 2>/dev/null | grep -q "SonarQube"; then
             print_success "SonarQube está listo"
             break
         fi
@@ -144,16 +163,16 @@ view_logs() {
     
     case $log_option in
         1)
-            docker-compose logs -f app
+            docker compose logs -f app
             ;;
         2)
-            docker-compose logs -f prometheus
+            docker compose logs -f prometheus
             ;;
         3)
-            docker-compose logs -f sonarqube
+            docker compose logs -f sonarqube
             ;;
         4)
-            docker-compose logs -f
+            docker compose logs -f
             ;;
         *)
             print_error "Opción inválida"
@@ -164,7 +183,7 @@ view_logs() {
 # Ver estado
 check_services() {
     print_section "Estado de Servicios"
-    docker-compose ps
+    docker compose ps
 }
 
 # Ejecutar tests
@@ -183,10 +202,28 @@ run_tests() {
 run_sonarqube_analysis() {
     print_header "Ejecutando Análisis de SonarQube"
     
-    # Verificar que SonarQube esté disponible
-    if ! curl -s -f http://localhost:9000/api/system/health > /dev/null 2>&1; then
-        print_error "SonarQube no está disponible"
-        print_info "Inicia SonarQube con: ./manage.sh"
+    request_sonarqube_password
+    
+    # Verificar que SonarQube esté disponible con reintentos
+    print_section "Verificando disponibilidad de SonarQube"
+    local max_attempts=10
+    local attempt=1
+    local sonarqube_ready=false
+    
+    while [ $attempt -le $max_attempts ]; do
+        if curl -s --connect-timeout 2 --max-time 5 http://localhost:9000/ 2>/dev/null | grep -q "SonarQube"; then
+            sonarqube_ready=true
+            print_success "SonarQube está disponible"
+            break
+        fi
+        print_info "Intento $attempt/$max_attempts - Esperando a SonarQube..."
+        sleep 3
+        attempt=$((attempt + 1))
+    done
+    
+    if [ "$sonarqube_ready" = false ]; then
+        print_error "SonarQube no está disponible después de $((max_attempts * 3)) segundos"
+        print_info "Verifica con: docker compose logs sonarqube"
         return 1
     fi
     
@@ -214,6 +251,13 @@ show_urls() {
     echo -e "${GREEN}Prometheus:${NC}"
     echo "  http://localhost:9090"
     echo "  http://localhost:9090/graph"
+    echo ""
+    
+    echo -e "${GREEN}Grafana (Dashboards):${NC}"
+    echo "  http://localhost:3000"
+    echo "  Usuario: admin"
+    echo "  Contraseña: admin"
+    echo "  Dashboard: Spring Boot Monitoring Dashboard"
     echo ""
     
     echo -e "${GREEN}SonarQube:${NC}"
@@ -246,10 +290,10 @@ cleanup_all() {
     fi
     
     print_section "Deteniendo servicios"
-    docker-compose down
+    docker compose down
     
     print_section "Eliminando volúmenes"
-    docker-compose down -v
+    docker compose down -v
     
     print_section "Eliminando contenedores dangling"
     docker container prune -f
