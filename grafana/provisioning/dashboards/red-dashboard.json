@@ -77,7 +77,7 @@
         "x": 0,
         "y": 0
       },
-      "id": 2,
+      "id": 1,
       "options": {
         "legend": {
           "calcs": [],
@@ -96,7 +96,7 @@
           "legendFormat": "{{method}} {{status}}"
         }
       ],
-      "title": "HTTP Requests Rate (5m)",
+      "title": "RED - Rate: HTTP Request Rate (req/s)",
       "type": "timeseries"
     },
     {
@@ -116,7 +116,7 @@
               }
             ]
           },
-          "unit": "short"
+          "unit": "percentunit"
         },
         "overrides": []
       },
@@ -126,7 +126,7 @@
         "x": 12,
         "y": 0
       },
-      "id": 3,
+      "id": 2,
       "options": {
         "orientation": "auto",
         "reduceOptions": {
@@ -143,13 +143,13 @@
       "pluginVersion": "8.0.0",
       "targets": [
         {
-          "expr": "http_server_requests_seconds_count",
+          "expr": "rate(http_server_requests_seconds_count{status=~\"4..|5..\"}[5m]) / rate(http_server_requests_seconds_count[5m])",
           "refId": "A",
-          "legendFormat": "{{method}} {{status}}"
+          "legendFormat": "{{method}} {{uri}} ({{status}})"
         }
       ],
-      "title": "Total HTTP Requests",
-      "type": "gauge"
+      "title": "RED - Errors: HTTP Error Rate (%)",
+      "type": "timeseries"
     },
     {
       "datasource": "Prometheus",
@@ -281,17 +281,17 @@
               }
             ]
           },
-          "unit": "bytes"
+          "unit": "s"
         },
         "overrides": []
       },
       "gridPos": {
         "h": 8,
-        "w": 12,
-        "x": 12,
+        "w": 24,
+        "x": 0,
         "y": 8
       },
-      "id": 5,
+      "id": 3,
       "options": {
         "legend": {
           "calcs": [
@@ -308,12 +308,17 @@
       "pluginVersion": "8.0.0",
       "targets": [
         {
-          "expr": "jvm_memory_used_bytes",
+          "expr": "histogram_quantile(0.95, rate(http_server_requests_seconds_bucket[5m]))",
           "refId": "A",
-          "legendFormat": "{{area}}"
+          "legendFormat": "95th percentile"
+        },
+        {
+          "expr": "histogram_quantile(0.50, rate(http_server_requests_seconds_bucket[5m]))",
+          "refId": "B",
+          "legendFormat": "50th percentile (median)"
         }
       ],
-      "title": "JVM Memory Usage",
+      "title": "RED - Duration: HTTP Request Duration (95th & 50th percentile)",
       "type": "timeseries"
     }
   ],
@@ -333,7 +338,7 @@
   },
   "timepicker": {},
   "timezone": "",
-  "title": "Spring Boot Monitoring Dashboard",
-  "uid": "springboot-monitoring",
+  "title": "Spring Boot RED Metrics Dashboard",
+  "uid": "springboot-red-dashboard",
   "version": 0
 }
